@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Roda da Vida — Segunda Versão</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #111827;
+      --muted: #94a3b8;
+      --text: #e5e7eb;
+      --accent: #a78bfa;
+      --accent-2: #22d3ee;
+      --ring: #334155;
+      --good: #10b981;
+      --warn: #f59e0b;
+      --bad: #ef4444;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+      background: radial-gradient(1200px circle at 80% -20%, #1f2937 0%, var(--bg) 35%, #0b1226 100%);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    header {
+      padding: 32px 20px 12px;
+      text-align: center;
+    }
+    header h1 {
+      margin: 0 0 8px;
+      font-size: 1.8rem;
+      letter-spacing: 0.2px;
+    }
+    header p { margin: 0; color: var(--muted); }
+
+    .container {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 18px;
+      max-width: 1100px;
+      margin: 20px auto 60px;
+      padding: 0 20px;
+    }
+
+    @media (min-width: 980px) {
+      .container {
+        grid-template-columns: 520px 1fr;
+      }
+    }
+
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 14px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    }
+
+    .section {
+      padding: 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .section:last-child { border-bottom: 0; }
+    .section h2 {
+      margin: 0 0 12px;
+      font-size: 1.2rem;
+    }
+    .section p { color: var(--muted); margin: 0 0 12px; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    @media (max-width: 520px) { .grid { grid-template-columns: 1fr; } }
+
+    label { display: block; font-weight: 600; margin-bottom: 6px; }
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"] {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.04);
+      color: var(--text);
+      outline: none;
+    }
+    input::placeholder { color: #9aa4b1; }
+
+    .area-row {
+      display: grid;
+      grid-template-columns: 140px 1fr 56px;
+      gap: 12px;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px dashed rgba(255,255,255,0.08);
+    }
+    .area-row:last-child { border-bottom: 0; }
+    .area-name {
+      font-weight: 600;
+      color: var(--text);
+    }
+    input[type="range"] {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 8px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--bad), var(--warn) 50%, var(--good));
+      outline: none;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: white;
+      border: 2px solid var(--accent);
+      box-shadow: 0 0 0 4px rgba(167,139,250,0.2);
+      cursor: pointer;
+    }
+    input[type="range"]::-moz-range-thumb {
+      width: 22px; height: 22px; border-radius: 50%;
+      background: white; border: 2px solid var(--accent);
+      box-shadow: 0 0 0 4px rgba(167,139,250,0.2);
+      cursor: pointer;
+    }
+    .score {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+      font-weight: 700;
+      color: var(--accent-2);
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 14px;
+    }
+    button, .ghost {
+      padding: 12px 16px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: linear-gradient(180deg, rgba(34,211,238,0.15), rgba(34,211,238,0.08));
+      color: var(--text);
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .ghost {
+      background: transparent;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .hint { color: var(--muted); font-size: 0.9rem; margin-top: 6px; }
+
+    /* Radar card */
+    .radar-wrap {
+      position: relative;
+      padding: 20px;
+    }
+    .radar-header {
+      display: flex; justify-content: space-between; align-items: baseline; gap: 10px;
+      padding: 0 4px 8px;
+    }
+    .radar-header h3 { margin: 0; font-size: 1.1rem; }
+    .radar-header .avg { color: var(--muted); font-weight: 600; }
+
+    .legend {
+      display: grid; gap: 8px; grid-template-columns: repeat(2, 1fr);
+      margin-top: 10px;
+    }
+    .legend-item {
+      display: flex; gap: 8px; align-items: center;
+      color: var(--muted);
+    }
+    .legend-swatch {
+      width: 16px; height: 16px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.18);
+    }
+
+    .footer {
+      text-align: center;
+      color: var(--muted);
+      padding: 12px;
+      font-size: 0.9rem;
+    }
+  </style>
+
+  <script src="https://cdn.jsdelivr.net/npm/dom-to-image-more@2.12.0/dist/dom-to-image-more.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+</head>
+<body>
+  <header>
+    <h1>Roda da Vida — Segunda Versão</h1>
+    <p>Preencha seus dados e avalie cada área de 0 a 10. Em seguida, envie suas respostas por e-mail.</p>
+  </header>
+
+  <main class="container">
+    <section class="card" aria-labelledby="form-title">
+      <div class="section">
+        <h2 id="form-title">Identificação</h2>
+        <p>Seus dados serão usados apenas para contato e para associar esta avaliação.</p>
+
+        <form id="lifeForm" autocomplete="on" novalidate>
+          <div class="grid">
+            <div>
+              <label for="nome">Nome</label>
+              <input id="nome" name="nome" type="text" placeholder="Seu nome completo" required />
+            </div>
+            <div>
+              <label for="email">E-mail</label>
+              <input id="email" name="email" type="email" placeholder="seuemail@exemplo.com" required />
+            </div>
+            <div>
+              <label for="celular">Celular</label>
+              <input id="celular" name="celular" type="tel" placeholder="(11) 98765-4321" required />
+            </div>
+            <div>
+              <label for="data">Data</label>
+              <input id="data" name="data" type="text" placeholder="dd/mm/aaaa" />
+            </div>
+          </div>
+
+          <div class="section" style="padding-left:0; padding-right:0; margin-top: 8px;">
+            <h2 style="padding: 0 20px;">Avaliação das áreas</h2>
+            <div id="areasList" style="padding: 0 20px;">
+              </div>
+            <div class="actions" style="padding: 0 20px 12px;">
+              <button type="button" id="resetBtn">Zerar notas</button>
+              <a class="ghost" href="#" id="shareLink" aria-label="Copiar link de compartilhamento">🔗 Copiar link com respostas</a>
+              <p class="hint">Dica: mova os controles para refletir seu nível atual de satisfação em cada área.</p>
+            </div>
+          </div>
+
+          <div class="section">
+            <h2>Enviar por e-mail / Baixar</h2>
+            <p>Escolha a opção para salvar ou compartilhar seus resultados.</p>
+            <div class="actions">
+              <button type="button" id="sendEmailBtn">Enviar por e-mail</button>
+              <button type="button" id="downloadTxtBtn">Baixar respostas (.txt)</button>
+              <button type="button" id="downloadPdfBtn" style="background: linear-gradient(180deg, rgba(255,100,100,0.15), rgba(255,0,0,0.08));">Baixar Roda (.pdf)</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <section class="card radar-wrap" aria-labelledby="radar-title">
+      <div class="radar-header">
+        <h3 id="radar-title">Visualização da Roda (Radar)</h3>
+        <div class="avg">Média: <span id="avgScore">0.0</span>/10</div>
+      </div>
+
+      <svg id="radar" viewBox="0 0 420 420" width="100%" height="420" role="img" aria-label="Gráfico radar da Roda da Vida">
+        <defs>
+          <radialGradient id="gridGrad" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#ffffff" stop-opacity="0.06"/>
+            <stop offset="100%" stop-color="#ffffff" stop-opacity="0.02"/>
+          </radialGradient>
+        </defs>
+        <circle cx="210" cy="210" r="170" fill="url(#gridGrad)" stroke="#334155" stroke-opacity="0.5"/>
+        <g id="rings"></g>
+        <g id="axes"></g>
+        <polygon id="shape" fill="rgba(167,139,250,0.28)" stroke="#a78bfa" stroke-width="2" points=""/>
+        <g id="points"></g>
+      </svg>
+
+      <div class="legend" id="legend"></div>
+
+      <div class="footer">As notas vão de 0 (insatisfação) a 10 (plena satisfação).</div>
+    </section>
+  </main>
+
+  <script>
+    // Configuração das áreas e cores
+    const AREAS = [
+      { key: 'saude', label: 'Saúde', color: '#10b981' },
+      { key: 'financas', label: 'Finanças', color: '#22c55e' },
+      { key: 'carreira', label: 'Carreira', color: '#06b6d4' },
+      { key: 'relacionamentos', label: 'Relacionamentos', color: '#3b82f6' },
+      { key: 'familia', label: 'Família', color: '#6366f1' },
+      { key: 'desenvolvimento', label: 'Desenvolvimento pessoal', color: '#a78bfa' },
+      { key: 'lazer', label: 'Lazer', color: '#f59e0b' },
+      { key: 'espiritualidade', label: 'Espiritualidade', color: '#ef4444' },
+      { key: 'ambiente', label: 'Ambiente', color: '#14b8a6' },
+      { key: 'contribuicao', label: 'Contribuição', color: '#eab308' },
+    ];
+
+    // Estado
+    const state = {
+      nome: '',
+      email: '',
+      celular: '',
+      data: '',
+      scores: Object.fromEntries(AREAS.map(a => [a.key, 0])),
+    };
+
+    // Elementos
+    const areasListEl = document.getElementById('areasList');
+    const radarEl = document.getElementById('radar');
+    const ringsEl = document.getElementById('rings');
+    const axesEl = document.getElementById('axes');
+    const shapeEl = document.getElementById('shape');
+    const pointsEl = document.getElementById('points');
+    const legendEl = document.getElementById('legend');
+    const avgEl = document.getElementById('avgScore');
+
+    const nomeEl = document.getElementById('nome');
+    const emailEl = document.getElementById('email');
+    const celularEl = document.getElementById('celular');
+    const dataEl = document.getElementById('data');
+
+    const resetBtn = document.getElementById('resetBtn');
+    const sendEmailBtn = document.getElementById('sendEmailBtn');
+    const downloadTxtBtn = document.getElementById('downloadTxtBtn');
+    const shareLink = document.getElementById('shareLink');
+    // NOVO: botão de PDF
+    const downloadPdfBtn = document.getElementById('downloadPdfBtn');
+
+
+    // Helpers
+    const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+    const fmt = (v) => Number(v).toFixed(1);
+
+    // UI: montar lista de áreas (VERIFICAÇÃO DE NOTAS REFORÇADA AQUI)
+    function buildAreasList() {
+      areasListEl.innerHTML = '';
+      AREAS.forEach(a => {
+        const row = document.createElement('div');
+        row.className = 'area-row';
+
+        const name = document.createElement('div');
+        name.className = 'area-name';
+        name.textContent = a.label;
+
+        const range = document.createElement('input');
+        range.type = 'range';
+        range.min = '0';
+        range.max = '10';
+        range.step = '1';
+        // Garante que o slider use o valor do estado
+        range.value = state.scores[a.key]; 
+        range.setAttribute('aria-label', `Nota para ${a.label}`);
+
+        const score = document.createElement('div');
+        score.className = 'score';
+        // Usa o valor formatado para iniciar a exibição
+        score.textContent = fmt(state.scores[a.key]); 
+        
+        range.addEventListener('input', () => {
+          state.scores[a.key] = Number(range.value);
+          // ATUALIZAÇÃO DA NOTA AO MOVER O SLIDER
+          score.textContent = fmt(state.scores[a.key]); 
+          updateRadar();
+          updateShareLink();
+        });
+
+        row.appendChild(name);
+        row.appendChild(range);
+        row.appendChild(score);
+        areasListEl.appendChild(row);
+      });
+    }
+
+    // Radar: construir grades, eixos e legendas
+    function buildRadarStatic() {
+      const cx = 210, cy = 210, R = 170;
+      ringsEl.innerHTML = '';
+      axesEl.innerHTML = '';
+      legendEl.innerHTML = '';
+
+      // Anéis de referência (2,4,6,8,10)
+      for (let r = 1; r <= 5; r++) {
+        const rr = (r/5)*R;
+        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        circle.setAttribute('cx', cx);
+        circle.setAttribute('cy', cy);
+        circle.setAttribute('r', rr);
+        circle.setAttribute('fill', 'none');
+        circle.setAttribute('stroke', '#334155');
+        circle.setAttribute('stroke-opacity', 0.35);
+        circle.setAttribute('stroke-dasharray', '4 6');
+        ringsEl.appendChild(circle);
+
+        const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        label.setAttribute('x', cx + rr + 6);
+        label.setAttribute('y', cy - 6);
+        label.setAttribute('fill', '#94a3b8');
+        label.setAttribute('font-size', '11');
+        label.textContent = String(r*2);
+        ringsEl.appendChild(label);
+      }
+
+      // Eixos
+      AREAS.forEach((a, i) => {
+        const angle = (Math.PI * 2 * i) / AREAS.length - Math.PI/2; // começa no topo
+        const x = cx + Math.cos(angle) * R;
+        const y = cy + Math.sin(angle) * R;
+
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('x1', cx); line.setAttribute('y1', cy);
+        line.setAttribute('x2', x);  line.setAttribute('y2', y);
+        line.setAttribute('stroke', '#475569');
+        line.setAttribute('stroke-opacity', 0.45);
+        axesEl.appendChild(line);
+
+        const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        const lx = cx + Math.cos(angle) * (R + 16);
+        const ly = cy + Math.sin(angle) * (R + 16);
+        label.setAttribute('x', lx);
+        label.setAttribute('y', ly);
+        label.setAttribute('fill', '#e5e7eb');
+        label.setAttribute('font-size', '11');
+        label.setAttribute('text-anchor', Math.cos(angle) > 0.4 ? 'start' : (Math.cos(angle) < -0.4 ? 'end' : 'middle'));
+        label.textContent = a.label;
+        axesEl.appendChild(label);
+
+        // Legenda
+        const li = document.createElement('div');
+        li.className = 'legend-item';
+        const sw = document.createElement('span');
+        sw.className = 'legend-swatch';
+        sw.style.background = a.color;
+        const name = document.createElement('span');
+        name.textContent = a.label;
+        li.appendChild(sw); li.appendChild(name);
+        legendEl.appendChild(li);
+      });
+    }
+
+    // Radar: atualizar polígono e pontos
+    function updateRadar() {
+      const cx = 210, cy = 210, R = 170, N = AREAS.length;
+      const pts = [];
+      pointsEl.innerHTML = '';
+
+      AREAS.forEach((a, i) => {
+        const angle = (Math.PI * 2 * i) / N - Math.PI/2;
+        const v = clamp(state.scores[a.key], 0, 10);
+        const r = (v / 10) * R;
+        const x = cx + Math.cos(angle) * r;
+        const y = cy + Math.sin(angle) * r;
+        pts.push([x, y]);
+
+        const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        dot.setAttribute('cx', x);
+        dot.setAttribute('cy', y);
+        dot.setAttribute('r', 4.5);
+        dot.setAttribute('fill', a.color);
+        dot.setAttribute('stroke', '#0b1226');
+        dot.setAttribute('stroke-width', 1.2);
+        pointsEl.appendChild(dot);
+      });
+
+      const pointsStr = pts.map(p => `${p[0]},${p[1]}`).join(' ');
+      shapeEl.setAttribute('points', pointsStr);
+
+      // média
+      const avg = Object.values(state.scores).reduce((s, v) => s + Number(v), 0) / AREAS.length;
+      avgEl.textContent = fmt(avg);
+    }
+
+    // Form: inputs principais
+    [nomeEl, emailEl, celularEl, dataEl].forEach(el => {
+      el.addEventListener('input', () => {
+        state[el.id] = el.value.trim();
+        updateShareLink();
+      });
+    });
+
+    // Botão: zerar
+    resetBtn.addEventListener('click', () => {
+      AREAS.forEach(a => { state.scores[a.key] = 0; });
+      buildAreasList();
+      updateRadar();
+      updateShareLink();
+    });
+
+    // Copiar link com respostas (URL com query params)
+    shareLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      const url = buildShareURL();
+      navigator.clipboard.writeText(url).then(() => {
+        shareLink.textContent = '✅ Link copiado';
+        setTimeout(() => shareLink.textContent = '🔗 Copiar link com respostas', 2000);
+      }).catch(() => {
+        alert('Não foi possível copiar. Copie manualmente:\n' + url);
+      });
+    });
+
+    // Montar URL com estado
+    function buildShareURL() {
+      const base = location.origin + location.pathname;
+      const params = new URLSearchParams();
+      if (state.nome) params.set('nome', state.nome);
+      if (state.email) params.set('email', state.email);
+      if (state.celular) params.set('celular', state.celular);
+      if (state.data) params.set('data', state.data);
+      AREAS.forEach(a => params.set(a.key, state.scores[a.key]));
+      return `${base}?${params.toString()}`;
+    }
+
+    // Parse estado da URL (para reabrir com dados)
+    function loadFromURL() {
+      const params = new URLSearchParams(location.search);
+      ['nome', 'email', 'celular', 'data'].forEach(k => {
+        if (params.has(k)) {
+          state[k] = params.get(k);
+          document.getElementById(k).value = state[k];
+        }
+      });
+      AREAS.forEach(a => {
+        const v = params.get(a.key);
+        if (v !== null) state.scores[a.key] = clamp(Number(v), 0, 10);
+      });
+    }
+
+    // Enviar por e-mail (mailto)
+    sendEmailBtn.addEventListener('click', () => {
+      // Validação simples
+      const missing = [];
+      if (!state.nome) missing.push('Nome');
+      if (!state.email) missing.push('E-mail');
+      if (!state.celular) missing.push('Celular');
+
+      if (missing.length) {
+        alert('Por favor, preencha: ' + missing.join(', ') + '.');
+        return;
+      }
+
+      const subject = encodeURIComponent(`Roda da Vida — ${state.nome}`);
+      const bodyLines = [];
+
+      bodyLines.push(`Nome: ${state.nome}`);
+      bodyLines.push(`E-mail: ${state.email}`);
+      bodyLines.push(`Celular: ${state.celular}`);
+      if (state.data) bodyLines.push(`Data: ${state.data}`);
+      bodyLines.push('');
+      bodyLines.push('Notas por área (0–10):');
+
+      AREAS.forEach(a => {
+        bodyLines.push(`- ${a.label}: ${fmt(state.scores[a.key])}`);
+      });
+
+      const avg = Object.values(state.scores).reduce((s, v) => s + Number(v), 0) / AREAS.length;
+      bodyLines.push('');
+      bodyLines.push(`Média geral: ${fmt(avg)} / 10`);
+
+      bodyLines.push('');
+      bodyLines.push('Link para revisar esta avaliação:');
+      bodyLines.push(buildShareURL());
+
+      const body = encodeURIComponent(bodyLines.join('\n'));
+      const mailto = `mailto:lilianelimapsicanalista@gmail.com?subject=${subject}&body=${body}`;
+      window.location.href = mailto;
+    });
+
+    // Baixar TXT
+    downloadTxtBtn.addEventListener('click', () => {
+      const lines = [];
+      lines.push(`Roda da Vida — Segunda Versão`);
+      lines.push(`Nome: ${state.nome || '-'}`);
+      lines.push(`E-mail: ${state.email || '-'}`);
+      lines.push(`Celular: ${state.celular || '-'}`);
+      lines.push(`Data: ${state.data || '-'}`);
+      lines.push('');
+      lines.push('Notas:');
+      AREAS.forEach(a => lines.push(`${a.label}: ${fmt(state.scores[a.key])}`));
+      const avg = Object.values(state.scores).reduce((s, v) => s + Number(v), 0) / AREAS.length;
+      lines.push('');
+      lines.push(`Média: ${fmt(avg)} / 10`);
+      lines.push('');
+      lines.push(`Revisão: ${buildShareURL()}`);
+
+      const blob = new Blob([lines.join('\n')], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Roda_da_Vida_${(state.nome || 'cliente').replace(/\s+/g,'_')}.txt`;
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    // NOVO: Função para Baixar PDF
+    downloadPdfBtn.addEventListener('click', async () => {
+        const radarCard = document.querySelector('.radar-wrap'); 
+        const nome = state.nome || 'cliente';
+        
+        const doc = new window.jspdf.jsPDF({
+            orientation: 'portrait',
+            unit: 'mm',
+            format: 'a4' 
+        });
+        
+        try {
+            // 1. Converter o elemento para uma imagem PNG/SVG
+            const dataUrl = await domtoimage.toPng(radarCard, {
+                quality: 0.95,
+                width: radarCard.offsetWidth,
+                height: radarCard.offsetHeight,
+                style: {
+                    background: '#111827', 
+                }
+            });
+
+            // 2. Adicionar a imagem e título ao PDF
+            const img = new Image();
+            img.src = dataUrl;
+            await new Promise(resolve => img.onload = resolve);
+            
+            const imgWidth = 190; 
+            const imgHeight = (img.height * imgWidth) / img.width;
+
+            // Título no topo do PDF
+            doc.setFontSize(18);
+            doc.setTextColor('#333333'); 
+            doc.text(`Roda da Vida — ${nome}`, 10, 15);
+            
+            // Subtítulo e dados
+            doc.setFontSize(12);
+            doc.setTextColor('#666666'); 
+            doc.text(`Data: ${state.data || '-'} | Média: ${avgEl.textContent}/10`, 10, 22);
+
+            // Adiciona a imagem capturada da roda
+            doc.addImage(dataUrl, 'PNG', 10, 30, imgWidth, imgHeight); 
+
+            // 3. Opcional: Adicionar a lista de notas abaixo do gráfico
+            let currentY = 30 + imgHeight + 10;
+            if (currentY < 260) {
+                doc.setFontSize(14);
+                doc.setTextColor('#333333');
+                doc.text('Avaliação Detalhada:', 10, currentY);
+                currentY += 8;
+
+                doc.setFontSize(11);
+                doc.setTextColor('#666666');
+                AREAS.forEach(a => {
+                    if (currentY > 280) { 
+                        doc.addPage();
+                        currentY = 15;
+                    }
+                    doc.text(`- ${a.label}: ${fmt(state.scores[a.key])} / 10`, 10, currentY);
+                    currentY += 6;
+                });
+            }
+
+            // 4. Salvar o PDF
+            doc.save(`Roda_da_Vida_${nome.replace(/\s+/g,'_')}.pdf`);
+
+        } catch (error) {
+            console.error('Erro ao gerar PDF:', error);
+            alert('Erro ao gerar o PDF. Verifique o console. Possivelmente, o navegador bloqueou o recurso de imagem para SVG.');
+        }
+    });
+    // FIM DA FUNÇÃO PDF
+
+
+    // Inicialização
+    loadFromURL();
+    buildAreasList();
+    buildRadarStatic();
+    updateRadar();
+    updateShareLink();
+
+    function updateShareLink() {
+      // Função mantida para compatibilidade
+    }
+  </script>
+</body>
+</html>
